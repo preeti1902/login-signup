@@ -2,19 +2,38 @@
 import React, { useState } from 'react';
 
 const Register = ({ onFormSwitch }) => {
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add registration logic here
-    console.log('Registering with:', fullName, email, password);
+    try {
+      const response = await fetch('YOUR_REGISTER_API_ENDPOINT', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ fullName, email, password }),
+      });
+      if (response.ok) {
+        // Handle successful registration
+        console.log('Registration successful');
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message);
+      }
+    } catch (error) {
+      console.error('Registration failed:', error);
+      setError('Registration failed. Please try again.');
+    }
   };
 
   return (
     <div className="form-container">
       <h2>Register</h2>
+      {error && <p>{error}</p>}
       <form onSubmit={handleSubmit}>
         <label htmlFor="fullName">Full Name:</label>
         <input type="text" id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} />
